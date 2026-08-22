@@ -21,9 +21,6 @@ services:
       mysql:
         condition: service_healthy
 
-    volumes:
-      - ./logs:/var/www/html/logs
-
   mysql:
     build:
       context: ./docker/mysql
@@ -37,10 +34,11 @@ services:
       - mysql_data:/var/lib/mysql
 
     healthcheck:
-      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-proot"]
-      interval: 5s
-      timeout: 3s
-      retries: 10
+      test: ["CMD-SHELL", "mysql -h127.0.0.1 -uroot -proot -e 'SELECT 1' >/dev/null 2>&1"]
+      interval: 3s
+      timeout: 5s
+      retries: 40
+      start_period: 3s
 
   mockserver:
     build:

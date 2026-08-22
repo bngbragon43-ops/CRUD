@@ -47,6 +47,8 @@ pipeline {
 
         stage('Run PHPUnit') {
             steps {
+                echo 'Variables d environnement vues par PHP dans le conteneur'
+                sh 'docker compose exec -T app php scripts/env_probe.php'
                 echo 'lancement des tests PHPUnit'
                 sh 'docker compose exec -T app vendor/bin/phpunit'
             }
