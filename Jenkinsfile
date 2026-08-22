@@ -2,6 +2,11 @@ pipeline {
 
     agent any
 
+    environment {
+        APP_PORT = '18000'
+        MOCKSERVER_PORT = '11080'
+    }
+
     stages {
 
         stage('Check Docker') {
