@@ -15,7 +15,7 @@ class ProductFunctionalTest extends TestCase
     protected function setUp(): void
     {
         $dotenv = Dotenv::createImmutable(dirname(__DIR__, 2));
-        $dotenv->load();
+        $dotenv->safeLoad();
 
         $database = new Database();
 

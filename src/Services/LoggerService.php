@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use Monolog\Handler\NullHandler;
 use Monolog\Handler\StreamHandler;
 use Monolog\Logger;
 
@@ -13,12 +14,15 @@ class LoggerService
     {
         $this->logger = new Logger('php-devops');
 
-        $this->logger->pushHandler(
-            new StreamHandler(
+        try {
+            $handler = new StreamHandler(
                 __DIR__ . '/../../logs/app.log',
                 Logger::DEBUG
-            )
-        );
+            );
+            $this->logger->pushHandler($handler);
+        } catch (\Throwable $e) {
+            $this->logger->pushHandler(new NullHandler());
+        }
     }
 
     public function info(string $message, array $context = []): void

@@ -7,6 +7,8 @@ RUN apt-get update && apt-get install -y --no-install-recommends unzip \
 
 RUN a2enmod rewrite
 
+RUN mv "$PHP_INI_DIR/php.ini-production" "$PHP_INI_DIR/php.ini"
+
 #  Vhost pointant sur Public/ (front controller)
 COPY docker/apache/000-default.conf /etc/apache2/sites-available/000-default.conf
 
