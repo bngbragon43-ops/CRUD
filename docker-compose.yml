@@ -1,0 +1,73 @@
+services:
+
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+
+    ports:
+      - "${APP_PORT:-8000}:80"
+
+    environment:
+      DB_HOST: mysql
+      DB_PORT: 3306
+      DB_NAME: php_devops
+      DB_USER: root
+      DB_PASSWORD: root
+      MOCKSERVER_BASE_URL: http://mockserver:1080
+      API_BASE_URL: http://localhost
+
+    depends_on:
+      mysql:
+        condition: service_healthy
+
+    volumes:
+      - ./logs:/var/www/html/logs
+
+  mysql:
+    image: mysql:8.0
+
+    environment:
+      MYSQL_DATABASE: php_devops
+      MYSQL_ROOT_PASSWORD: root
+
+    volumes:
+      - mysql_data:/var/lib/mysql
+      - ./docker/mysql/init.sql:/docker-entrypoint-initdb.d/init.sql:ro
+
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-proot"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+  mockserver:
+    image: mockserver/mockserver:latest
+
+    ports:
+      - "${MOCKSERVER_PORT:-1080}:1080"
+
+    environment:
+      MOCKSERVER_INITIALIZATION_JSON_PATH: /config/expectations.json
+
+    volumes:
+      - ./docker/mockserver/expectations.json:/config/expectations.json:ro
+
+  jenkins:
+    build:
+      context: ./jenkins
+      dockerfile: Dockerfile
+
+    user: root
+
+    ports:
+      - "${JENKINS_PORT:-8080}:8080"
+      - "50000:50000"
+
+    volumes:
+      - jenkins_home:/var/jenkins_home
+      - /var/run/docker.sock:/var/run/docker.sock
+
+volumes:
+  mysql_data:
+  jenkins_home:
