@@ -41,7 +41,7 @@ pipeline {
         stage('Test MockServer') {
             steps {
                 echo 'Verification de mockserver'
-                sh 'docker compose exec -T app php scripts/wait_for_http.php http://mockserver:1080/mockserver/status 60'
+                sh 'docker compose exec -T app php scripts/wait_for_http.php http://mockserver:1080/external/products/1 60'
             }
         }
 

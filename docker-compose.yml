@@ -42,7 +42,7 @@ services:
       retries: 10
 
   mockserver:
-    image: mockserver/mockserver:latest
+    image: mockserver/mockserver:5.15.0
 
     ports:
       - "${MOCKSERVER_PORT:-1080}:1080"
