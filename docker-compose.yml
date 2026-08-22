@@ -25,7 +25,9 @@ services:
       - ./logs:/var/www/html/logs
 
   mysql:
-    image: mysql:8.0
+    build:
+      context: ./docker/mysql
+      dockerfile: Dockerfile
 
     environment:
       MYSQL_DATABASE: php_devops
@@ -33,7 +35,6 @@ services:
 
     volumes:
       - mysql_data:/var/lib/mysql
-      - ./docker/mysql/init.sql:/docker-entrypoint-initdb.d/init.sql:ro
 
     healthcheck:
       test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-proot"]
@@ -42,16 +43,15 @@ services:
       retries: 10
 
   mockserver:
-    image: mockserver/mockserver:5.15.0
+    build:
+      context: ./docker/mockserver
+      dockerfile: Dockerfile
 
     ports:
       - "${MOCKSERVER_PORT:-1080}:1080"
 
     environment:
       MOCKSERVER_INITIALIZATION_JSON_PATH: /config/expectations.json
-
-    volumes:
-      - ./docker/mockserver/expectations.json:/config/expectations.json:ro
 
   jenkins:
     build:

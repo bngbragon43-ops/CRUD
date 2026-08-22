@@ -20,7 +20,7 @@ pipeline {
         stage('Build Docker Image') {
             steps {
                 echo 'Construction des images'
-                sh 'docker compose build app'
+                sh 'docker compose build app mysql mockserver'
             }
         }
 
