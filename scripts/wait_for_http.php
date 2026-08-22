@@ -9,6 +9,7 @@ if ($url === '') {
 }
 
 $deadline = time() + $timeoutSeconds;
+$lastError = null;
 $context = stream_context_create([
     'http' => ['timeout' => 2, 'ignore_errors' => true],
 ]);
@@ -21,8 +22,22 @@ while (time() < $deadline) {
         exit(0);
     }
 
+    if (is_array($headers)) {
+        $lastError = 'HTTP ' . trim((string) $headers[0]);
+    }
+
     sleep(1);
 }
 
 fwrite(STDERR, "Timeout after {$timeoutSeconds}s waiting for {$url}\n");
+
+if ($lastError !== null) {
+    fwrite(STDERR, "Last response: {$lastError}\n");
+}
+
+$e = error_get_last();
+if ($e !== null && isset($e['message'])) {
+    fwrite(STDERR, 'Last error: ' . trim($e['message']) . "\n");
+}
+
 exit(1);

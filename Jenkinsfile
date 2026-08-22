@@ -41,7 +41,7 @@ pipeline {
         stage('Test MockServer') {
             steps {
                 echo 'Verification de mockserver'
-                sh 'docker compose exec -T app php scripts/wait_for_http.php http://mockserver:1080/external/products/1 60'
+                sh 'docker compose exec -T app php scripts/wait_for_http.php http://mockserver:1080/external/products/1 120'
             }
         }
 
@@ -55,17 +55,22 @@ pipeline {
 
     post {
 
-        always {
-            echo 'Nettoyage Docker'
-            sh 'docker compose down -v --remove-orphans'
+        failure {
+            echo 'Logs des conteneurs au moment de l echec'
+            sh 'docker compose logs --tail 50 mockserver app || true'
+            echo 'echec'
         }
 
         success {
             echo 'Termine avec success'
         }
 
-        failure {
-            echo 'echec'
+        always {
+            echo 'Nettoyage Docker'
+        }
+
+        cleanup {
+            sh 'docker compose down -v --remove-orphans || true'
         }
     }
 }
